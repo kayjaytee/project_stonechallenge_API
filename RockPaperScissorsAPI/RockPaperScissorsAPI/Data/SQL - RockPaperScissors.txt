@@ -1,0 +1,605 @@
+CREATE DATABASE [RockPaperScissor]
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+-- TABLE [User]
+
+CREATE TABLE  [User](
+	[UserID] bigint IDENTITY (1,1) NOT NULL,
+	[UserName] nvarchar(15) NOT NULL,
+	[FirstName] nvarchar(50) NOT NULL,
+	[LastName] nvarchar(50) NOT NULL,
+	[UserEmail] nvarchar(50) NOT NULL, 
+	[Password] nvarchar(255) NOT NULL,
+	[Salt] nvarchar(255) NOT NULL,
+	[Token] nvarchar(max),
+	[TokenIssued] datetime,
+	[Wins] bigint NOT NULL,
+	[Losses] bigint NOT NULL,
+	[GamesPlayed] bigint NOT NULL
+	--[IsOnline] bit NOT NULL
+
+CONSTRAINT [PK_User] PRIMARY KEY CLUSTERED
+( [UserID] ASC )
+WITH (
+     PAD_INDEX = OFF,
+     STATISTICS_NORECOMPUTE = OFF,
+     IGNORE_DUP_KEY = OFF,
+     ALLOW_ROW_LOCKS = ON,
+     ALLOW_PAGE_LOCKS = ON,
+     OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
+     ON [PRIMARY]
+    )ON [PRIMARY]
+
+-- Table [Message]
+CREATE TABLE [Message](
+	[MessageID] bigint IDENTITY (1,1) NOT NULL,
+	[FromUserID] bigint NOT NULL,
+	[ToUserID] bigint,
+	[Value] nvarchar(50),
+	[TimeSent] nvarchar(50),
+	[TimeRecieved] datetime,
+
+	CONSTRAINT [PK_Message] PRIMARY KEY CLUSTERED
+	( [MessageID] ASC )
+	WITH (
+     PAD_INDEX = OFF,
+     STATISTICS_NORECOMPUTE = OFF,
+     IGNORE_DUP_KEY = OFF,
+     ALLOW_ROW_LOCKS = ON,
+     ALLOW_PAGE_LOCKS = ON,
+     OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF)
+     ON [PRIMARY]
+    )ON [PRIMARY]
+
+	ALTER TABLE [Message] WITH CHECK ADD 
+	CONSTRAINT [FK_Message_From_User] FOREIGN KEY([FromUserID]) REFERENCES [User] ([UserID]),
+	CONSTRAINT [FK_Message_To_User] FOREIGN KEY([ToUserID]) REFERENCES [User] ([UserID])
+
+	ALTER TABLE [Message] CHECK CONSTRAINT [FK_Message_From_User]
+	ALTER TABLE [Message] CHECK CONSTRAINT [FK_Message_To_User]
+
+
+
+GO
+
+
+-- TABLE [PlayerInvite]
+
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [PlayerInvite](
+	[InviteFromUserID] bigint NOT NULL,
+	[InviteToUserID] bigint NOT NULL,
+CONSTRAINT  [PK_PlayerInvite]  PRIMARY   KEY   CLUSTERED  (
+        [InviteFromUserID]  ASC ,
+        [InviteToUserID]  ASC
+ )   WITH  (
+      PAD_INDEX   = OFF ,
+      STATISTICS_NORECOMPUTE   =   OFF ,
+      IGNORE_DUP_KEY   =   OFF ,
+      ALLOW_ROW_LOCKS   =   ON ,
+      ALLOW_PAGE_LOCKS   =   ON , 
+      OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) 
+      ON  [PRIMARY]  ) ON  [PRIMARY]
+
+	  
+ALTER TABLE [PlayerInvite]  WITH  CHECK ADD CONSTRAINT [FK_Invite_To_User] FOREIGN KEY ([InviteToUserID])
+REFERENCES  [User] ([UserID])
+GO
+
+ALTER TABLE [PlayerInvite] CHECK CONSTRAINT [FK_Invite_To_User]
+GO
+
+ALTER TABLE [PlayerInvite] WITH CHECK ADD CONSTRAINT [FK_Invite_From_User] FOREIGN KEY ([InviteFromUserID])
+REFERENCES [User] ([UserID])
+GO
+
+ALTER TABLE [PlayerInvite] CHECK CONSTRAINT [FK_Invite_From_User] 
+GO
+
+Select * From [PlayerInvite];
+
+
+--Table [PlayerMoves]
+CREATE TABLE [PlayerMoves](
+	[MoveID] smallint PRIMARY KEY IDENTITY (0,1) NOT NULL,
+	[MovesTitle] VARCHAR(50) NOT NULL
+
+)
+INSERT INTO [PlayerMoves](MovesTitle) VALUES ('');
+INSERT INTO [PlayerMoves](MovesTitle) VALUES ('Rock');
+INSERT INTO [PlayerMoves](MovesTitle) VALUES ('Paper');
+INSERT INTO [PlayerMoves](MovesTitle) VALUES ('Scissor');
+
+SELECT * FROM [PlayerMoves];
+
+-- Table [Game]
+CREATE TABLE [Game](
+	[GameID] bigint PRIMARY KEY IDENTITY (1,1) NOT NULL,
+	[PlayerOneID] bigint,
+	[PlayerTwoID] bigint,
+	[PlayerOneChoice] smallint NULL,
+	[PlayerTwoChoice] smallint NULL,
+	[PlayerWinner] bigint NULL,
+	[PlayerMessageID] bigint NULL,
+	--[IsActive] bit
+	CONSTRAINT [FK_Game_PlayerOne_Move] FOREIGN KEY([PlayerOneChoice]) REFERENCES [PlayerMoves] ([MoveID]),
+	CONSTRAINT [FK_Game_PlayerTwo_Move] FOREIGN KEY([PlayerTwoChoice]) REFERENCES [PlayerMoves] ([MoveID]),
+	CONSTRAINT [FK_PlayerWinner] FOREIGN KEY([PlayerWinner]) REFERENCES [User] ([UserID]) ON DELETE NO ACTION,
+	CONSTRAINT [FK_Game_Message] FOREIGN KEY([PlayerMessageID]) REFERENCES [Message] ([MessageID]) ON DELETE NO ACTION,
+	CONSTRAINT [FK_Game_PlayerOne_User] FOREIGN KEY([PlayerOneID]) REFERENCES [User] ([UserID]) ON DELETE NO ACTION,
+    CONSTRAINT [FK_Game_PlayerTwo_User] FOREIGN KEY([PlayerTwoID]) REFERENCES [User] ([UserID]) ON DELETE NO ACTION
+
+)
+GO
+
+--ALTER TABLE [Game] DROP CONSTRAINT [FK_Game_PlayerOne_Move];
+--ALTER TABLE [Game] WITH CHECK ADD CONSTRAINT [FK_Game_PlayerOne_Move] FOREIGN KEY ([PlayerOneID])
+--REFERENCES  [User] ([UserID]) ON DELETE NO ACTION;
+
+--ALTER TABLE [Game] DROP CONSTRAINT [FK_Game_PlayerTwo_Move];
+--ALTER TABLE [Game] WITH CHECK ADD CONSTRAINT [FK_Game_PlayerTwo_Move] FOREIGN KEY ([PlayerTwoID])
+--REFERENCES  [User] ([UserID]) ON DELETE NO ACTION;
+
+--ALTER TABLE [Game] DROP CONSTRAINT [FK_PlayerWinner];
+--ALTER TABLE [Game] WITH CHECK ADD CONSTRAINT [FK_PlayerWinner] FOREIGN KEY ([PlayerWinner])
+--REFERENCES [User] ([UserID]) ON DELETE NO ACTION;
+
+--ALTER TABLE [Game] DROP CONSTRAINT [FK_Game_Message];
+--ALTER TABLE [Game] WITH CHECK ADD CONSTRAINT [FK_Game_Message] FOREIGN KEY([PlayerMessageID])
+--REFERENCES [Message] ([MessageID]) ON DELETE NO ACTION;
+
+
+
+
+
+--för att kunna spara game moves 
+
+SELECT * FROM [User];
+SELECT * FROM [Message];
+SELECT * FROM [Game];
+SELECT * FROM [PlayerMoves];
+SELECT * FROM [PlayerInvite];
+
+DROP TABLE [User];
+DROP TABLE [Message];
+DROP TABLE [PlayerInvite];
+DROP TABLE [PlayerMoves];
+DROP TABLE [Game];
+--
+DROP PROCEDURE [Procedure_UserAdd];
+DROP PROCEDURE [Procedure_GameCreated];
+DROP PROCEDURE [Procedure_Savemessage];
+DROP PROCEDURE [Procedure_GetSalt];
+DROP PROCEDURE [Procedure_AttemptLogin];
+DROP PROCEDURE [Procedure_UploadMessageFromDatabase];
+AS
+	SELECT TOP 1 [Value]
+	FROM [Message]
+	WHERE [FromUserID] = @FromUserID AND [ToUserID] = @ToUserID
+	ORDER BY [MessageID] DESC;
+
+	SELECT * FROM [User];
+
+---- Stored Procesdure UserAdd ----
+
+CREATE OR ALTER PROCEDURE [Procedure_UserAdd]
+@UserName nvarchar(15),
+@FirstName nvarchar(50),
+@LastName nvarchar(50),
+@UserEmail nvarchar(50),
+@Password nvarchar(50),
+@Salt nvarchar(50),
+@Token nvarchar(50),
+@TokenIssued datetime,
+@Wins bigint,
+@Losses bigint,
+@GamesPlayed bigint -- 11 total
+AS
+	INSERT INTO [User]([UserName],[FirstName],[LastName],[UserEmail],[Password],[Salt],[Token],[TokenIssued],[Wins],[Losses],[GamesPlayed])
+	VALUES
+	(@UserName,
+	@FirstName,
+	@LastName,
+	@UserEmail,
+	@Password,
+	@Salt,
+	@Token,
+	@TokenIssued,
+	@Wins,
+	@Losses,
+	@GamesPlayed);
+
+-- Cannot be Executed without a Parameter Value
+
+Select * From [User];
+Select * From [PlayerInvite];
+
+CREATE OR ALTER PROCEDURE  [Procedure_GetSalt]
+@UserName nvarchar(15)
+AS
+	SELECT [Salt] FROM [User] WHERE [UserName] = @Username;
+
+
+
+CREATE OR ALTER PROCEDURE  [Procedure_UpdateWithNewPassword]
+@NewPassword nvarchar(15),
+@Password nvarchar(15)
+AS
+BEGIN
+    UPDATE [User]
+    SET
+	[Password] = @NewPassword
+    WHERE [Password] = @Password
+END
+GO
+
+CREATE OR ALTER PROCEDURE [Procedure_ForgotPasswordNewGenerated]
+@ReplaceOldPassword nvarchar(max),
+@RemoveSalt nvarchar(max),
+@UserName nvarchar(15),
+@UserEmail nvarchar(50)
+AS
+BEGIN
+    UPDATE [User]
+    SET
+	[Password] = @ReplaceOldPassword,
+	[Salt] = @RemoveSalt
+    WHERE [UserName] = @UserName AND [UserEmail] = @UserEmail
+END
+GO
+
+-- Cannot be Executed without a Parameter Value
+
+CREATE OR ALTER PROCEDURE  [Procedure_PostToken]
+@Token nvarchar(max),
+@TokenIssued datetime,
+@UserName nvarchar(15)
+
+AS
+BEGIN
+  SET NOCOUNT ON; --Necessery to save the full string
+	UPDATE [User]
+	SET
+	[Token] = @Token,
+	[TokenIssued] = @TokenIssued
+	WHERE [UserName] = @Username
+END
+GO
+
+BEGIN
+	UPDATE [User]
+	SET
+	[Token] = 'test'
+	WHERE [UserName] = 'string'
+END
+GO
+
+AS
+BEGIN
+    UPDATE [Message]
+    SET
+			[FromUserID] = @FromUserID,
+			[ToUserID] = @ToUserID,
+			[Value] = @Value,
+			[TimeSent] = @TimeSent
+    WHERE [MessageID] = @MessageID
+END
+GO
+
+SELECT * FROM [User];
+-- Cannot be Executed without a Parameter Value
+
+CREATE OR ALTER PROCEDURE [Procedure_AttemptLogin]
+@UserName nvarchar(15),
+@Password nvarchar(255)
+AS
+
+		SELECT [UserName], [Password] FROM [User] WHERE
+													[UserName] = @UserName
+													AND [Password] =  @Password;
+
+
+	SELECT [UserName], [Password] FROM [User] WHERE [UserName] = 'string';
+
+	Select * From [User];
+-- Cannot be Executed without a Parameter Value
+
+CREATE OR ALTER PROCEDURE [Procedure_GetEmail]
+@UserEmail nvarchar(20),
+@UserName nvarchar(15)
+AS
+	SELECT [UserEmail], [UserName] FROM [User] WHERE [UserName] = @UserName AND [UserEmail] = @UserEmail;
+
+
+
+		SELECT [UserEmail], [UserName] FROM [User] WHERE [UserName] = 'string' AND [UserEmail] = 'user@example.com';
+
+-- Cannot be Executed without a Parameter Value
+
+CREATE PROCEDURE [Procedure_GameCreated]
+@PlayerOneID bigint,
+@IsActive bit
+AS
+	INSERT INTO [Game] ([PlayerOneID],[IsActive]) VALUES (@PlayerOneID, @IsActive);
+
+	-- Cannot be Executed without a Parameter Value
+
+CREATE OR ALTER PROCEDURE  [Procedure_SaveMessage]
+@FromUserID bigint,
+@ToUserID bigint,
+@Value nvarchar(50),
+@TimeSent nvarchar(50)
+
+AS
+	INSERT INTO [Message]([FromUserID],[ToUserID],[Value],[TimeSent])
+	VALUES (@FromUserID, @ToUserID, @Value, @TimeSent);
+
+		-- Cannot be Executed without a Parameter Value
+
+CREATE OR ALTER PROCEDURE [Procedure_GetMyMessages]
+@UserID bigint
+--@TimeRecieved datetime
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	SELECT [MessageID], [FromUserID], [ToUserID], [Value], [TimeSent], [TimeRecieved]
+	FROM [Message] WHERE [ToUserID] = @UserID
+
+END
+GO
+
+	UPDATE [Message]
+	SET [TimeRecieved] = @TimeRecieved
+	WHERE [ToUserID] = @UserID
+
+
+SELECT * FROM [User];
+
+SELECT * FROM [Message];
+
+CREATE OR ALTER PROCEDURE [Procedure_FindLastCreatedGame]
+@GameID bigint,
+@PlayerOneID bigint
+
+AS
+	SELECT MAX ([GameID]) FROM [Game] AND
+	INSERT INTO [Message]([FromUserID],[Value],[TimeSent])
+	VALUES (@FromUserID, @Value, @TimeSent);
+
+			-- Cannot be Executed without a Parameter Value
+
+CREATE OR ALTER PROCEDURE [Procedure_UploadMessageFromDatabase]
+@FromUserID bigint,
+@ToUserID bigint
+
+AS
+	SELECT TOP 1 [Value]
+	FROM [Message]
+	WHERE [FromUserID] = @FromUserID AND [ToUserID] = @ToUserID
+	ORDER BY [MessageID] DESC;
+
+
+
+	--PROCEDURE [HttpPost(CreatePlayerInvitation)]
+CREATE OR ALTER PROCEDURE [Procedure_CreatePlayerInvitation]
+@InviteFromUserID bigint,
+@InviteToUserID bigint
+AS
+BEGIN
+    INSERT INTO [PlayerInvite]
+        (
+			[InviteFromUserID],
+			[InviteToUserID]
+        )
+    VALUES
+        (
+			@InviteFromUserID,
+			@InviteToUserID
+        )
+END
+GO
+
+SELECT * FROM [User];
+SELECT * FROM [PlayerInvite];
+
+DELETE FROM [PlayerInvite] WHERE [InviteFromUserID] = 2;
+
+
+
+
+CREATE OR ALTER PROCEDURE [Procedure_GetPlayerInviteToUserIDAsync]
+@InviteToUserID bigint
+AS
+BEGIN
+	SELECT [InviteFromUserID], [InviteToUserID]
+    FROM [PlayerInvite]
+	WHERE [InviteToUserID] = @InviteToUserID
+END
+GO
+
+CREATE OR ALTER PROCEDURE [Procedure_CheckPlayerInviteBothID]
+@InviteFromUserID bigint,
+@InviteToUserID bigint
+AS
+BEGIN
+	SELECT COUNT(*)
+    FROM [PlayerInvite]
+	WHERE [InviteFromUserID] = @InviteFromUserID
+	AND [InviteToUserID] = @InviteToUserID
+END
+GO
+
+SELECT * FROM [PlayerInvite];
+SELECT * FROM [User];
+
+
+	SELECT COUNT(*)
+    FROM [PlayerInvite]
+	WHERE [InviteFromUserID] = 5
+	AND [InviteToUserID] = 2;
+
+
+CREATE OR ALTER PROCEDURE [Procedure_CreateNewGame]
+@PlayerOneID bigint,
+@PlayerTwoID bigint,
+@PlayerOneChoice tinyint null,
+@PlayerTwoChoice tinyint null,
+@PlayerWinner bigint null,
+@PlayerMessageID bigint null
+AS
+BEGIN
+    INSERT INTO [Game]
+        (
+			[PlayerOneID],
+			[PlayerTwoID],
+			[PlayerOneChoice],
+			[PlayerTwoChoice], 
+			[PlayerWinner],
+			[PlayerMessageID]
+        )
+    VALUES
+        (
+			@PlayerOneID,
+            @PlayerTwoID,
+            @PlayerOneChoice,
+            @PlayerTwoChoice,
+            @PlayerWinner,
+			@PlayerMessageID
+        )
+END
+GO
+
+Select * FROM [PlayerMoves];
+
+CREATE OR ALTER PROCEDURE [Procedure_PlayerOneMove]
+@PlayerOneID bigint,
+@PlayerOneChoice tinyint
+AS
+BEGIN
+    UPDATE [Game]
+    SET [PlayerOneChoice] = @PlayerOneChoice
+    WHERE [PlayerOneID] = @PlayerOneID
+END
+GO
+
+CREATE OR ALTER PROCEDURE [Procedure_PlayerTwoMove]
+@PlayerTwoID bigint,
+@PlayerTwoChoice tinyint
+AS
+BEGIN
+    UPDATE [Game]
+    SET [PlayerTwoChoice] = @PlayerTwoChoice
+    WHERE [PlayerTwoID] = @PlayerTwoID
+END
+GO
+
+CREATE OR ALTER PROCEDURE [Procedure_DetermineWinner]
+@GameID bigint,
+@PlayerWinner bigint
+AS
+BEGIN
+    UPDATE [Game]
+    SET [PlayerWinner] = @PlayerWinner
+    WHERE [GameID] = @GameID
+END
+GO
+
+CREATE OR ALTER PROCEDURE [Procedure_UpdateScoreWinner] -- fix this
+@PlayerWinner bigint,
+@Wins bigint,
+@GamesPlayed bigint
+AS
+BEGIN
+    UPDATE [User]
+    SET
+	[GamesPlayed] = @GamesPlayed,
+	[Wins] = @Wins
+    WHERE [UserID] = @PlayerWinner
+END
+GO
+
+CREATE OR ALTER PROCEDURE [Procedure_UpdateScoreLoser] -- fix this
+@GameID bigint,
+@PlayerWinner bigint,
+@Losses bigint,
+@GamesPlayed bigint
+AS
+BEGIN
+    UPDATE [User]
+    SET
+	[GamesPlayed] = @GamesPlayed,
+	[Losses] = @Losses
+    WHERE [UserID] = @PlayerWinner
+END
+GO
+
+CREATE OR ALTER PROCEDURE [Procedure_UpdateScore]
+@GameID bigint,
+@PlayerWinner bigint,
+@PlayerLoser bigint,
+@PlayerOneID bigint,
+@PlayerTwoID bigint,
+@Wins bigint,
+@Losses bigint,
+@GamesPlayed bigint
+AS
+BEGIN
+    SELECT * FROM [Game]
+    WHERE [GameID] = @GameID AND [PlayerWinner] = @PlayerWinner;
+
+	IF (@PlayerWinner = @PlayerOneID)
+	BEGIN
+		--WINNER
+		UPDATE [User]
+		SET [Wins] = [Wins] + 1,
+			[GamesPlayed] = + 1
+		WHERE [UserID] = @PlayerOneID;
+
+		--LOSER
+		UPDATE [User]
+		SET [Losses] = [Losses] + 1,
+			[GamesPlayed] = [GamesPlayed] + 1
+		WHERE [UserID] = @PlayerTwoID;
+	END
+
+	ELSE IF (@PlayerWinner = @PlayerTwoID)
+	BEGIN
+		--WINNER
+		UPDATE [User]
+		SET [Wins] = [Wins] + 1,
+			[GamesPlayed] = + 1
+		WHERE [UserID] = @PlayerTwoID;
+
+		--LOSER
+		UPDATE [User]
+		SET [Losses] = [Losses] + 1,
+			[GamesPlayed] = [GamesPlayed] + 1
+		WHERE [UserID] = @PlayerOneID;
+	END
+
+
+END
+GO
+
+
+
+SELECT * FROM [Game];
+
+
+    SELECT * FROM [Game]
+    WHERE [GameID] = 1 and [PlayerWinner] = 1;
+
+	SELECT [Wins], [GamesPlayed] FROM [User] WHERE [UserID] = 1;
+	SET [Wins] = @Wins,
+		[Losses] = @Losses,
+		[GamesPlayed] = @GamesPlayed
+	WHERE [UserID] = @PlayerWinner;

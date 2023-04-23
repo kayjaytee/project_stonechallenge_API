@@ -1,0 +1,496 @@
+
+	-- //////////////// CRUD PROCEDURES FOR API //////////////// 
+
+	-- [USER CONTROLLER]
+	-- DROP PROCEDURE [Procedure_GetUsers];
+	-- DROP PROCEDURE [Procedure_GetUserByID];
+	-- DROP PROCEDURE [Procedure_CreateNewUser];
+	-- DROP PROCEDURE [Procedure_UpdateUser];
+	-- DROP PROCEDURE [Procedure_DeleteUser];
+	
+--PROCEDURE [HttpGet(GetUsers)]
+CREATE OR ALTER PROCEDURE [Procedure_GetUsers]
+AS
+BEGIN
+	SELECT
+	[UserID],
+	[UserName],
+	[FirstName],
+	[LastName],
+	[UserEmail], 
+	[Password],
+	--[Salt],
+	[Token],
+	[TokenIssued],
+	[Wins],
+	[Losses],
+	[GamesPlayed]
+    FROM [User]
+END
+GO
+
+--PROCEDURE [HttpGet(GetUserByID)]
+CREATE OR ALTER PROCEDURE [Procedure_GetUserByID]
+@UserID bigint
+AS
+BEGIN
+	SELECT
+		[UserID],
+		[UserName],
+		[FirstName],
+		[LastName],
+		[UserEmail], 
+		[Password],
+		[Salt],
+		[Token],
+		[TokenIssued],
+		[Wins],
+		[Losses],
+		[GamesPlayed]
+    FROM [User] WHERE [UserID] = @UserID
+END
+GO
+
+--PROCEDURE [HttpPost(CreateNewUser)]
+CREATE OR ALTER PROCEDURE [Procedure_CreateNewUser]
+@UserName nvarchar(15),
+@FirstName nvarchar(50),
+@LastName nvarchar(50),
+@UserEmail nvarchar(50),
+@Password nvarchar(50),
+@Salt varbinary(1024),
+@Token nvarchar(50),
+@TokenIssued datetime,
+@Wins bigint,
+@Losses bigint,
+@GamesPlayed bigint
+AS
+BEGIN
+    INSERT INTO [User]
+        (
+			[UserName],
+			[FirstName],
+			[LastName],
+			[UserEmail],
+			[Password],
+			[Salt],
+			[Token],
+			[TokenIssued],
+			[Wins],
+			[Losses],
+			[GamesPlayed]
+        )
+    VALUES
+        (
+			@UserName,
+			@FirstName,
+			@LastName,
+			@UserEmail,
+			@Password,
+			@Salt,
+			@Token,
+			@TokenIssued,
+			@Wins,
+			@Losses,
+			@GamesPlayed
+        )
+END
+GO
+
+
+--PROCEDURE [HttpPost(UpdateUser)]
+CREATE OR ALTER PROCEDURE [Procedure_UpdateUser]
+@UserID bigint,
+@UserName nvarchar(15),
+@FirstName nvarchar(50),
+@LastName nvarchar(50),
+@UserEmail nvarchar(50),
+@Password nvarchar(50),
+--@Salt varbinary(1024),
+@Token nvarchar(50),
+@TokenIssued datetime,
+@Wins bigint,
+@Losses bigint,
+@GamesPlayed bigint
+AS
+BEGIN
+    UPDATE [User]
+    SET
+			[UserName] = @UserName,
+			[FirstName] = @FirstName,
+			[LastName] = @LastName,
+			[UserEmail] = @UserEmail,
+			[Password] = @Password,
+			[Salt] = @Salt,
+			[Token] = @Token,
+			[TokenIssued] = @TokenIssued,
+			[Wins] = @Wins,
+			[Losses] = @Losses,
+			[GamesPlayed] = @GamesPlayed
+    WHERE [UserID] = @UserID
+END
+GO
+
+--PROCEDURE [HttpDelete(DeleteUser)]
+CREATE OR ALTER PROCEDURE [Procedure_DeleteUser]
+@UserID bigint
+AS
+BEGIN
+    DELETE FROM [User] WHERE [UserId] = @UserID
+END
+GO
+
+	-- [GAME CONTROLLER]
+	-- DROP PROCEDURE [Procedure_GetGames];
+	-- DROP PROCEDURE [Procedure_GetGameByID];
+	-- DROP PROCEDURE [Procedure_CreateNewGame];
+	-- DROP PROCEDURE [Procedure_UpdateGame];
+	-- DROP PROCEDURE [Procedure_DeleteGame];
+
+	
+--PROCEDURE [HttpGet(GetGamesList)]
+CREATE OR ALTER PROCEDURE [Procedure_GetGames]
+AS
+BEGIN
+	SELECT
+	[GameID],
+	[PlayerOneID],
+	[PlayerTwoID],
+	[PlayerOneChoice],
+	[PlayerTwoChoice], 
+	[PlayerWinner],
+	[PlayerMessageID]
+    FROM [Game]
+END
+GO
+
+--PROCEDURE [HttpGet(GetGameByID)]
+CREATE OR ALTER PROCEDURE [Procedure_GetGameByID]
+@GameID bigint
+AS
+BEGIN
+	SELECT
+		[GameID],
+		[PlayerOneID],
+		[PlayerTwoID],
+		[PlayerOneChoice],
+		[PlayerTwoChoice], 
+		[PlayerWinner],
+		[PlayerMessageID]
+    FROM [Game] WHERE [GameID] = @GameID
+END
+GO
+
+--PROCEDURE [HttpPost(CreateNewGame)]
+CREATE OR ALTER PROCEDURE [Procedure_CreateNewGame]
+@PlayerOneID bigint,
+@PlayerTwoID bigint,
+@PlayerOneChoice tinyint,
+@PlayerTwoChoice tinyint,
+@PlayerWinner bigint,
+@PlayerMessageID bigint
+AS
+BEGIN
+    INSERT INTO [Game]
+        (
+			[PlayerOneID],
+			[PlayerTwoID],
+			[PlayerOneChoice],
+			[PlayerTwoChoice], 
+			[PlayerWinner],
+			[PlayerMessageID]
+        )
+    VALUES
+        (
+			@PlayerOneID,
+            @PlayerTwoID,
+            @PlayerOneChoice,
+            @PlayerTwoChoice,
+            @PlayerWinner,
+            @PlayerMessageID
+        )
+END
+GO
+
+
+--PROCEDURE [HttpPost(UpdateGame)]
+CREATE OR ALTER PROCEDURE [Procedure_UpdateGame]
+@GameID bigint,
+@PlayerOneID bigint,
+@PlayerTwoID bigint,
+@PlayerOneChoice tinyint,
+@PlayerTwoChoice tinyint,
+@PlayerWinner bigint,
+@PlayerMessageID bigint
+AS
+BEGIN
+    UPDATE [Game]
+    SET
+			[PlayerOneID] = @PlayerOneID,
+			[PlayerTwoID] = @PlayerTwoID,
+			[PlayerOneChoice] = @PlayerOneChoice,
+			[PlayerTwoChoice] = @PlayerTwoChoice,
+			[PlayerWinner] = @PlayerWinner,
+			[PlayerMessageID] = @PlayerMessageID
+    WHERE [GameID] = @GameID
+END
+GO
+
+--PROCEDURE [HttpDelete(DeleteGame)]
+CREATE OR ALTER PROCEDURE [Procedure_DeleteGame]
+@GameID bigint
+AS
+BEGIN
+    DELETE FROM [Game] WHERE [GameID] = @GameID
+END
+GO
+
+		-- [MESSAGE CONTROLLER]
+	-- DROP PROCEDURE [Procedure_GetMessages];
+	-- DROP PROCEDURE [Procedure_GetMessageByID];
+	-- DROP PROCEDURE [Procedure_CreateNewMessage];
+	-- DROP PROCEDURE [Procedure_UpdateMessage];
+	-- DROP PROCEDURE [Procedure_DeleteMessage];
+
+	
+--PROCEDURE [HttpGet(GetMessagesList)]
+CREATE OR ALTER PROCEDURE [Procedure_GetMessages]
+AS
+BEGIN
+	SELECT
+	[MessageID],
+	[FromUserID],
+	[ToUserID],
+	[Value],
+	[TimeSent]
+    FROM [Message]
+END
+GO
+
+--PROCEDURE [HttpGet(GetMessageByID)]
+CREATE OR ALTER PROCEDURE [Procedure_GetMessageByID]
+@MessageID bigint
+AS
+BEGIN
+	SELECT
+		[FromUserID],
+		[ToUserID],
+		[Value],
+		[TimeSent]
+    FROM [Message] WHERE [MessageID] = @MessageID
+END
+GO
+
+--PROCEDURE [HttpPost(CreateNewMessage)]
+CREATE OR ALTER PROCEDURE [Procedure_CreateNewMessage]
+@FromUserID bigint,
+@ToUserID bigint,
+@Value nvarchar,
+@TimeSent nvarchar,
+@TimeRecieved datetime
+AS
+BEGIN
+    INSERT INTO [Message]
+        (
+			[FromUserID],
+			[ToUserID],
+			[Value],
+			[TimeSent]
+        )
+    VALUES
+        (
+			@FromUserID,
+			@ToUserID,
+			@Value,
+			@TimeSent
+        )
+END
+GO
+
+
+--PROCEDURE [HttpPost(UpdateMessage)]
+CREATE OR ALTER PROCEDURE [Procedure_UpdateMessage]
+@MessageID bigint,
+@FromUserID bigint,
+@ToUserID bigint,
+@Value nvarchar,
+@TimeSent nvarchar
+AS
+BEGIN
+    UPDATE [Message]
+    SET
+			[FromUserID] = @FromUserID,
+			[ToUserID] = @ToUserID,
+			[Value] = @Value,
+			[TimeSent] = @TimeSent
+    WHERE [MessageID] = @MessageID
+END
+GO
+
+--PROCEDURE [HttpDelete(DeleteMessage)]
+CREATE OR ALTER PROCEDURE [Procedure_DeleteMessage]
+@MessageID bigint
+AS
+BEGIN
+    DELETE FROM [Message] WHERE [MessageID] = @MessageID
+END
+GO
+
+	-- [PLAYERINVITE CONTROLLER]
+	-- DROP PROCEDURE [Procedure_GetAllPlayerInvites];
+	-- DROP PROCEDURE [Procedure_GetPlayerInviteFromUserID];
+	-- DROP PROCEDURE [Procedure_GetPlayerInviteToUserID];
+	-- DROP PROCEDURE [Procedure_CreatePlayerInvitation];
+	-- DROP PROCEDURE [Procedure_EditPlayerInvitation];
+	-- DROP PROCEDURE [Procedure_DeletePlayerInvitation];
+
+	
+--PROCEDURE [HttpGet(GetMessagesList)]
+CREATE OR ALTER PROCEDURE [Procedure_GetAllPlayerInvites]
+AS
+BEGIN
+	SELECT
+	[InviteFromUserID],
+	[InviteToUserID]
+    FROM [PlayerInvite]
+END
+GO
+
+--PROCEDURE [HttpGet(GetPlayerInviteFromUserID)]
+CREATE OR ALTER PROCEDURE [Procedure_GetPlayerInviteFromUserID]
+@InviteFromUserID bigint
+AS
+BEGIN
+	SELECT
+		[InviteFromUserID],
+		[InviteToUserID]
+    FROM [PlayerInvite] WHERE [InviteFromUserID] = @InviteFromUserID
+END
+GO
+
+--PROCEDURE [HttpGet(GetPlayerInviteToUserID)]
+CREATE OR ALTER PROCEDURE [Procedure_GetPlayerToFromUserID]
+@InviteToUserID bigint
+AS
+BEGIN
+	SELECT [InviteFromUserID], [InviteToUserID]
+    FROM [PlayerInvite]
+	WHERE [InviteToUserID] = @InviteToUserID
+END
+GO
+
+--PROCEDURE [HttpPost(CreatePlayerInvitation)]
+CREATE OR ALTER PROCEDURE [Procedure_CreatePlayerInvitation]
+@InviteFromUserID bigint,
+@InviteToUserID bigint
+AS
+BEGIN
+    INSERT INTO [PlayerInvite]
+        (
+			[InviteFromUserID],
+			[InviteToUserID]
+        )
+    VALUES
+        (
+			@InviteFromUserID,
+			@InviteToUserID
+        )
+END
+GO
+
+
+--PROCEDURE [HttpPost(EditPlayerInvitation)]
+CREATE OR ALTER PROCEDURE [Procedure_EditPlayerInvitation]
+@InviteFromUserID bigint,
+@InviteToUserID bigint
+AS
+BEGIN
+    UPDATE [PlayerInvite]
+    SET
+			[InviteFromUserID] = @InviteFromUserID,
+			[InviteToUserID] = @InviteToUserID
+    WHERE [InviteFromUserID] = @InviteFromUserID
+END
+GO
+
+--PROCEDURE [HttpDelete(DeletePlayerInvitation)]
+CREATE OR ALTER PROCEDURE [Procedure_DeletePlayerInvitation]
+@InviteFromUserID bigint
+AS
+BEGIN
+    DELETE FROM [PlayerInvite] WHERE [InviteFromUserID] = @InviteFromUserID
+END
+GO
+
+	-- [PLAYERMOVES CONTROLLER]
+	-- DROP PROCEDURE [Procedure_GetPlayerMoves];
+	-- DROP PROCEDURE [Procedure_GetPlayerMovesByID];
+	-- DROP PROCEDURE [Procedure_CreatePlayerMove];
+	-- DROP PROCEDURE [Procedure_EditPlayerInvitation];
+	-- DROP PROCEDURE [Procedure_DeletePlayerMove];
+
+	
+--PROCEDURE [HttpGet(GetPlayerMovesList)]
+CREATE OR ALTER PROCEDURE [Procedure_GetPlayerMoves]
+AS
+BEGIN
+	SELECT
+	[MoveID],
+	[MovesTitle]
+    FROM [PlayerMoves]
+END
+GO
+
+--PROCEDURE [HttpGet(GetPlayerMovesByID)]
+CREATE OR ALTER PROCEDURE [Procedure_GetPlayerMovesByID]
+@MoveID tinyint
+AS
+BEGIN
+	SELECT
+		[MoveID],
+		[MovesTitle]
+    FROM [PlayerMoves] WHERE [MoveID] = @MoveID
+
+END
+GO
+
+--PROCEDURE [HttpPost(CreatePlayerMove)]
+CREATE OR ALTER PROCEDURE [Procedure_CreatePlayerMove]
+@MoveID tinyint,
+@MovesTitle NVARCHAR(50)
+AS
+BEGIN
+    INSERT INTO [PlayerMoves]
+        (
+			[MovesTitle]
+        )
+    VALUES
+        (
+			@MovesTitle
+        )
+END
+GO
+
+
+--PROCEDURE [HttpPut(UpdatePlayerMove)]
+CREATE OR ALTER PROCEDURE [Procedure_UpdatePlayerMove]
+@MoveID tinyint,
+@MovesTitle NVARCHAR(50)
+AS
+BEGIN
+    UPDATE [PlayerMoves]
+    SET
+			[MovesTitle] = @MovesTitle
+    WHERE [MoveID] = @MoveID
+END
+GO
+
+--PROCEDURE [HttpDelete(DeletePlayerMove)]
+CREATE OR ALTER PROCEDURE [Procedure_DeletePlayerMove]
+@MoveID tinyint
+AS
+BEGIN
+    DELETE FROM [PlayerMoves] WHERE [MoveID] = @MoveID
+END
+GO
+
