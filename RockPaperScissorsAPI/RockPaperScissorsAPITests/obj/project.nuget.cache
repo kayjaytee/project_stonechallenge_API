@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "+m7v7bHRQnCEQ+aCjvJfyD1hp21uS29nnGYX5o3DuPphR/hQdI4R3DV2qdGGH3M3XqbGiAM2sqlzXzsWxFsvZg==",
+  "dgSpecHash": "w0+MJ0W+k/7pJtWBJMpNTXXnK9QIgHcz0sX40YlORsrniMYrj8Bi7j6uFf/7LVsKERkUcTD3cyh4b9OLwZjFSw==",
   "success": true,
-  "projectFilePath": "C:\\Users\\K-J\\source\\repos\\RockPaperScissorsAPI\\RockPaperScissorsAPITests\\RockPaperScissorsAPITests.csproj",
+  "projectFilePath": "C:\\Users\\K-J\\Documents\\GitHub\\projectstonechallengeAPI\\RockPaperScissorsAPI\\RockPaperScissorsAPITests\\RockPaperScissorsAPITests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\K-J\\.nuget\\packages\\azure.core\\1.24.0\\azure.core.1.24.0.nupkg.sha512",
     "C:\\Users\\K-J\\.nuget\\packages\\azure.identity\\1.6.0\\azure.identity.1.6.0.nupkg.sha512",

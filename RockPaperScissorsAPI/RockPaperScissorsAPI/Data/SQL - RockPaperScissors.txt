@@ -7,20 +7,18 @@ SET QUOTED_IDENTIFIER ON
 GO
 -- TABLE [User]
 
-CREATE TABLE  [User](
+CREATE TABLE [User](
 	[UserID] bigint IDENTITY (1,1) NOT NULL,
 	[UserName] nvarchar(15) NOT NULL,
 	[FirstName] nvarchar(50) NOT NULL,
 	[LastName] nvarchar(50) NOT NULL,
 	[UserEmail] nvarchar(50) NOT NULL, 
-	[Password] nvarchar(255) NOT NULL,
-	[Salt] nvarchar(255) NOT NULL,
+	[Password] nvarchar(60) NOT NULL,
 	[Token] nvarchar(max),
 	[TokenIssued] datetime,
 	[Wins] bigint NOT NULL,
 	[Losses] bigint NOT NULL,
 	[GamesPlayed] bigint NOT NULL
-	--[IsOnline] bit NOT NULL
 
 CONSTRAINT [PK_User] PRIMARY KEY CLUSTERED
 ( [UserID] ASC )
@@ -35,13 +33,17 @@ WITH (
     )ON [PRIMARY]
 
 -- Table [Message]
+
+SELECT * FROM [User];
+
+
 CREATE TABLE [Message](
 	[MessageID] bigint IDENTITY (1,1) NOT NULL,
 	[FromUserID] bigint NOT NULL,
 	[ToUserID] bigint,
 	[Value] nvarchar(50),
-	[TimeSent] nvarchar(50),
-	[TimeRecieved] datetime,
+	[TimeSent] datetime2,
+	[TimeReceived] datetime2
 
 	CONSTRAINT [PK_Message] PRIMARY KEY CLUSTERED
 	( [MessageID] ASC )
@@ -62,13 +64,7 @@ CREATE TABLE [Message](
 	ALTER TABLE [Message] CHECK CONSTRAINT [FK_Message_From_User]
 	ALTER TABLE [Message] CHECK CONSTRAINT [FK_Message_To_User]
 
-
-
 GO
-
-
--- TABLE [PlayerInvite]
-
 
 SET ANSI_NULLS ON
 GO
@@ -110,7 +106,7 @@ Select * From [PlayerInvite];
 --Table [PlayerMoves]
 CREATE TABLE [PlayerMoves](
 	[MoveID] smallint PRIMARY KEY IDENTITY (0,1) NOT NULL,
-	[MovesTitle] VARCHAR(50) NOT NULL
+	[MovesTitle] VARCHAR(50)
 
 )
 INSERT INTO [PlayerMoves](MovesTitle) VALUES ('');
@@ -129,7 +125,7 @@ CREATE TABLE [Game](
 	[PlayerTwoChoice] smallint NULL,
 	[PlayerWinner] bigint NULL,
 	[PlayerMessageID] bigint NULL,
-	--[IsActive] bit
+	[IsActive] bit
 	CONSTRAINT [FK_Game_PlayerOne_Move] FOREIGN KEY([PlayerOneChoice]) REFERENCES [PlayerMoves] ([MoveID]),
 	CONSTRAINT [FK_Game_PlayerTwo_Move] FOREIGN KEY([PlayerTwoChoice]) REFERENCES [PlayerMoves] ([MoveID]),
 	CONSTRAINT [FK_PlayerWinner] FOREIGN KEY([PlayerWinner]) REFERENCES [User] ([UserID]) ON DELETE NO ACTION,
@@ -158,10 +154,6 @@ GO
 
 
 
-
-
---för att kunna spara game moves 
-
 SELECT * FROM [User];
 SELECT * FROM [Message];
 SELECT * FROM [Game];
@@ -174,43 +166,29 @@ DROP TABLE [PlayerInvite];
 DROP TABLE [PlayerMoves];
 DROP TABLE [Game];
 --
-DROP PROCEDURE [Procedure_UserAdd];
-DROP PROCEDURE [Procedure_GameCreated];
-DROP PROCEDURE [Procedure_Savemessage];
-DROP PROCEDURE [Procedure_GetSalt];
-DROP PROCEDURE [Procedure_AttemptLogin];
-DROP PROCEDURE [Procedure_UploadMessageFromDatabase];
-AS
-	SELECT TOP 1 [Value]
-	FROM [Message]
-	WHERE [FromUserID] = @FromUserID AND [ToUserID] = @ToUserID
-	ORDER BY [MessageID] DESC;
 
-	SELECT * FROM [User];
 
----- Stored Procesdure UserAdd ----
+---- Stored Procesdure  ----
 
 CREATE OR ALTER PROCEDURE [Procedure_UserAdd]
 @UserName nvarchar(15),
 @FirstName nvarchar(50),
 @LastName nvarchar(50),
 @UserEmail nvarchar(50),
-@Password nvarchar(50),
-@Salt nvarchar(50),
+@Password nvarchar(60),
 @Token nvarchar(50),
 @TokenIssued datetime,
 @Wins bigint,
 @Losses bigint,
 @GamesPlayed bigint -- 11 total
 AS
-	INSERT INTO [User]([UserName],[FirstName],[LastName],[UserEmail],[Password],[Salt],[Token],[TokenIssued],[Wins],[Losses],[GamesPlayed])
+	INSERT INTO [User]([UserName],[FirstName],[LastName],[UserEmail],[Password],[Token],[TokenIssued],[Wins],[Losses],[GamesPlayed])
 	VALUES
 	(@UserName,
 	@FirstName,
 	@LastName,
 	@UserEmail,
 	@Password,
-	@Salt,
 	@Token,
 	@TokenIssued,
 	@Wins,
@@ -222,36 +200,32 @@ AS
 Select * From [User];
 Select * From [PlayerInvite];
 
-CREATE OR ALTER PROCEDURE  [Procedure_GetSalt]
-@UserName nvarchar(15)
-AS
-	SELECT [Salt] FROM [User] WHERE [UserName] = @Username;
 
 
 
 CREATE OR ALTER PROCEDURE  [Procedure_UpdateWithNewPassword]
-@NewPassword nvarchar(15),
-@Password nvarchar(15)
+@NewPassword nvarchar(60),
+@OldPassword nvarchar(60)
 AS
 BEGIN
     UPDATE [User]
     SET
 	[Password] = @NewPassword
-    WHERE [Password] = @Password
+    WHERE [Password] = @OldPassword
 END
 GO
 
+
 CREATE OR ALTER PROCEDURE [Procedure_ForgotPasswordNewGenerated]
-@ReplaceOldPassword nvarchar(max),
-@RemoveSalt nvarchar(max),
+@ReplaceOldPassword nvarchar(60),
 @UserName nvarchar(15),
 @UserEmail nvarchar(50)
 AS
 BEGIN
     UPDATE [User]
     SET
-	[Password] = @ReplaceOldPassword,
-	[Salt] = @RemoveSalt
+	[Password] = @ReplaceOldPassword
+
     WHERE [UserName] = @UserName AND [UserEmail] = @UserEmail
 END
 GO
@@ -298,13 +272,10 @@ SELECT * FROM [User];
 -- Cannot be Executed without a Parameter Value
 
 CREATE OR ALTER PROCEDURE [Procedure_AttemptLogin]
-@UserName nvarchar(15),
-@Password nvarchar(255)
+@UserName nvarchar(15)
 AS
 
-		SELECT [UserName], [Password] FROM [User] WHERE
-													[UserName] = @UserName
-													AND [Password] =  @Password;
+		SELECT [UserName], [Password] FROM [User] WHERE [UserName] = @UserName;
 
 
 	SELECT [UserName], [Password] FROM [User] WHERE [UserName] = 'string';
@@ -336,7 +307,7 @@ CREATE OR ALTER PROCEDURE  [Procedure_SaveMessage]
 @FromUserID bigint,
 @ToUserID bigint,
 @Value nvarchar(50),
-@TimeSent nvarchar(50)
+@TimeSent datetime2
 
 AS
 	INSERT INTO [Message]([FromUserID],[ToUserID],[Value],[TimeSent])
@@ -345,21 +316,21 @@ AS
 		-- Cannot be Executed without a Parameter Value
 
 CREATE OR ALTER PROCEDURE [Procedure_GetMyMessages]
-@UserID bigint
---@TimeRecieved datetime
+@UserID bigint,
+@TimeReceived datetime2
 AS
 BEGIN
 	SET NOCOUNT ON;
 
-	SELECT [MessageID], [FromUserID], [ToUserID], [Value], [TimeSent], [TimeRecieved]
+	UPDATE [Message]
+	SET [TimeReceived] = @TimeReceived
+	WHERE [ToUserID] = @UserID
+
+	SELECT [MessageID], [FromUserID], [ToUserID], [Value], [TimeSent], [TimeReceived]
 	FROM [Message] WHERE [ToUserID] = @UserID
 
 END
 GO
-
-	UPDATE [Message]
-	SET [TimeRecieved] = @TimeRecieved
-	WHERE [ToUserID] = @UserID
 
 
 SELECT * FROM [User];
@@ -414,8 +385,6 @@ SELECT * FROM [PlayerInvite];
 DELETE FROM [PlayerInvite] WHERE [InviteFromUserID] = 2;
 
 
-
-
 CREATE OR ALTER PROCEDURE [Procedure_GetPlayerInviteToUserIDAsync]
 @InviteToUserID bigint
 AS
@@ -440,6 +409,7 @@ GO
 
 SELECT * FROM [PlayerInvite];
 SELECT * FROM [User];
+SELECT * FROM [Game];
 
 
 	SELECT COUNT(*)
@@ -543,63 +513,33 @@ END
 GO
 
 CREATE OR ALTER PROCEDURE [Procedure_UpdateScore]
-@GameID bigint,
-@PlayerWinner bigint,
-@PlayerLoser bigint,
-@PlayerOneID bigint,
-@PlayerTwoID bigint,
-@Wins bigint,
-@Losses bigint,
-@GamesPlayed bigint
+@GameID bigint
 AS
 BEGIN
-    SELECT * FROM [Game]
-    WHERE [GameID] = @GameID AND [PlayerWinner] = @PlayerWinner;
+    UPDATE [User]
+    SET
+	[GamesPlayed] = [GamesPlayed] + 1
+    WHERE [UserID] IN (SELECT [PlayerOneID] FROM [Game] WHERE [GameID] = @GameID)
+        OR [UserID] IN (SELECT [PlayerTwoID] FROM [Game] WHERE [GameID] = @GameID);
 
-	IF (@PlayerWinner = @PlayerOneID)
-	BEGIN
-		--WINNER
-		UPDATE [User]
-		SET [Wins] = [Wins] + 1,
-			[GamesPlayed] = + 1
-		WHERE [UserID] = @PlayerOneID;
+	UPDATE [User]
+	SET
+	[Wins] = [Wins] + 1
+	WHERE [UserID] = (SELECT [PlayerOneID] FROM [Game] WHERE [GameID] = @GameID AND [PlayerWinner] = [PlayerOneID])
+		OR [UserID] = (SELECT [PlayerTwoID] FROM [Game] WHERE [GameID] = @GameID AND [PlayerWinner] = [PlayerTwoID]);
 
-		--LOSER
-		UPDATE [User]
-		SET [Losses] = [Losses] + 1,
-			[GamesPlayed] = [GamesPlayed] + 1
-		WHERE [UserID] = @PlayerTwoID;
-	END
-
-	ELSE IF (@PlayerWinner = @PlayerTwoID)
-	BEGIN
-		--WINNER
-		UPDATE [User]
-		SET [Wins] = [Wins] + 1,
-			[GamesPlayed] = + 1
-		WHERE [UserID] = @PlayerTwoID;
-
-		--LOSER
-		UPDATE [User]
-		SET [Losses] = [Losses] + 1,
-			[GamesPlayed] = [GamesPlayed] + 1
-		WHERE [UserID] = @PlayerOneID;
-	END
-
-
+	UPDATE [User]
+	SET
+	[Losses] = [Losses] + 1
+	WHERE [UserID] = (SELECT [PlayerOneID] FROM [Game] WHERE [GameID] = @GameID AND [PlayerWinner] <> [PlayerOneID])
+		OR [UserID] = (SELECT [PlayerTwoID] FROM [Game] WHERE [GameID] = @GameID AND [PlayerWinner] <> [PlayerTwoID]);
 END
 GO
+SELECT* FROM [User];
+SELECT [PlayerOneID] FROM [Game] WHERE [GameID] = 1 AND [PlayerOneID] = [PlayerWinner]
 
 
 
+SELECT * FROM [User];
 SELECT * FROM [Game];
-
-
-    SELECT * FROM [Game]
-    WHERE [GameID] = 1 and [PlayerWinner] = 1;
-
-	SELECT [Wins], [GamesPlayed] FROM [User] WHERE [UserID] = 1;
-	SET [Wins] = @Wins,
-		[Losses] = @Losses,
-		[GamesPlayed] = @GamesPlayed
-	WHERE [UserID] = @PlayerWinner;
+SELECT * FROM [PlayerMoves];

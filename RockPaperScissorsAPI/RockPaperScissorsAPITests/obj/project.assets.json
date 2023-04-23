@@ -9030,11 +9030,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\K-J\\source\\repos\\RockPaperScissorsAPI\\RockPaperScissorsAPITests\\RockPaperScissorsAPITests.csproj",
+      "projectUniqueName": "C:\\Users\\K-J\\Documents\\GitHub\\projectstonechallengeAPI\\RockPaperScissorsAPI\\RockPaperScissorsAPITests\\RockPaperScissorsAPITests.csproj",
       "projectName": "RockPaperScissorsAPITests",
-      "projectPath": "C:\\Users\\K-J\\source\\repos\\RockPaperScissorsAPI\\RockPaperScissorsAPITests\\RockPaperScissorsAPITests.csproj",
+      "projectPath": "C:\\Users\\K-J\\Documents\\GitHub\\projectstonechallengeAPI\\RockPaperScissorsAPI\\RockPaperScissorsAPITests\\RockPaperScissorsAPITests.csproj",
       "packagesPath": "C:\\Users\\K-J\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\K-J\\source\\repos\\RockPaperScissorsAPI\\RockPaperScissorsAPITests\\obj\\",
+      "outputPath": "C:\\Users\\K-J\\Documents\\GitHub\\projectstonechallengeAPI\\RockPaperScissorsAPI\\RockPaperScissorsAPITests\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
@@ -9058,8 +9058,8 @@
         "net7.0": {
           "targetAlias": "net7.0",
           "projectReferences": {
-            "C:\\Users\\K-J\\source\\repos\\RockPaperScissorsAPI\\RockPaperScissorsAPI\\RockPaperScissorsAPI.csproj": {
-              "projectPath": "C:\\Users\\K-J\\source\\repos\\RockPaperScissorsAPI\\RockPaperScissorsAPI\\RockPaperScissorsAPI.csproj"
+            "C:\\Users\\K-J\\Documents\\GitHub\\projectstonechallengeAPI\\RockPaperScissorsAPI\\RockPaperScissorsAPI\\RockPaperScissorsAPI.csproj": {
+              "projectPath": "C:\\Users\\K-J\\Documents\\GitHub\\projectstonechallengeAPI\\RockPaperScissorsAPI\\RockPaperScissorsAPI\\RockPaperScissorsAPI.csproj"
             }
           }
         }
