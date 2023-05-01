@@ -10,10 +10,3 @@ public interface IPlayerMovesService
     public Task<long> UpdatePlayerMoveAsync(PlayerMoves playerMoves);
     public Task<long> DeletePlayerMoveAsync(byte MoveID);
 }
-
-
-// WHAT REMAINS:
-
-// PlayerMoves API needs to be finished; start here.
-// Stored Procedures still required for PlayerInvite, Message and PlayerMoves.
-// Then custom calls are needed

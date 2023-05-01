@@ -16,7 +16,6 @@ public class UserService : IUserService
     private readonly DataContext _context;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-
     public UserService(DataContext context, IHttpContextAccessor httpContextAccessor)
     { 
         _context = context;
@@ -91,18 +90,15 @@ public class UserService : IUserService
 
     public async Task<long> CreateNewUserAsync(User user)
     {
-
-        //string salt = Hashing.CreateSalt(10);
-        //var passwordHash = Hashing.CreatePasswordHash(user.Password,salt);
-
+        var salt = BCrypt.Net.BCrypt.GenerateSalt(12);
+        var passwordHash = BCrypt.Net.BCrypt.HashPassword(user.Password, salt);
 
         var parameter = new List<SqlParameter>();
         parameter.Add(new SqlParameter("@UserName", user.UserName));
         parameter.Add(new SqlParameter("@FirstName", user.FirstName));
         parameter.Add(new SqlParameter("@LastName", user.LastName));
         parameter.Add(new SqlParameter("@UserEmail", user.UserEmail));
-        //parameter.Add(new SqlParameter("@Password", passwordHash));
-        //parameter.Add(new SqlParameter("@Salt", salt));
+        parameter.Add(new SqlParameter("@Password", passwordHash));
         parameter.Add(new SqlParameter("@Token", "N/A"));
         parameter.Add(new SqlParameter("@TokenIssued", DateTime.Now));
         parameter.Add(new SqlParameter("@Wins", user.Wins));
@@ -117,7 +113,6 @@ public class UserService : IUserService
             @LastName,
             @UserEmail,
             @Password,
-            @Salt,
             @Token,
             @TokenIssued,
             @Wins,
@@ -129,8 +124,8 @@ public class UserService : IUserService
 
     public async Task<long> UpdateUserAsync(User user)
     {
-        //string salt = Hashing.CreateSalt(10);
-        //var passwordHash = Hashing.CreatePasswordHash(user.Password, salt);
+        var salt = BCrypt.Net.BCrypt.GenerateSalt(12);
+        var passwordHash = BCrypt.Net.BCrypt.HashPassword(user.Password, salt);
 
         var parameter = new List<SqlParameter>();
         parameter.Add(new SqlParameter("@UserID", user.UserID));
@@ -138,8 +133,7 @@ public class UserService : IUserService
         parameter.Add(new SqlParameter("@FirstName", user.FirstName));
         parameter.Add(new SqlParameter("@LastName", user.LastName));
         parameter.Add(new SqlParameter("@UserEmail", user.UserEmail));
-        //parameter.Add(new SqlParameter("@Password", passwordHash));
-        //parameter.Add(new SqlParameter("@Salt", salt));
+        parameter.Add(new SqlParameter("@Password", passwordHash));
         parameter.Add(new SqlParameter("@Token", "N/A"));
         parameter.Add(new SqlParameter("@TokenIssued", DateTime.Now));
         parameter.Add(new SqlParameter("@Wins", user.Wins));
@@ -155,7 +149,6 @@ public class UserService : IUserService
             @LastName,
             @UserEmail,
             @Password,
-            @Salt,
             @Token,
             @TokenIssued,
             @Wins,
@@ -218,7 +211,6 @@ public class UserService : IUserService
         .ToListAsync());
 
         return result;
-
     }
 
     #region Email/RestorePasswordService
@@ -257,8 +249,6 @@ public class UserService : IUserService
 
     public async Task<long> InsertNewPassword(ResetPassword request)
     {
-
-
         var parameter = new List<SqlParameter>();
         parameter.Add(new SqlParameter("@NewPassword", request.NewPassword));
         parameter.Add(new SqlParameter("@OldPassword", request.OldPassword));
@@ -268,7 +258,6 @@ public class UserService : IUserService
         (@"EXECUTE [Procedure_UpdateWithNewPassword]
             @NewPassword,
             @OldPassword", parameter.ToArray()));
-
 
         return result;
     }
@@ -288,10 +277,7 @@ public class UserService : IUserService
             @TokenIssued,
             @UserName", parameter.ToArray()));
 
-
         return result;
-
-
     }
 
     //public async Task<long> TokenCompare(User user)

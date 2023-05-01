@@ -11,7 +11,6 @@ public class GameService : IGameService
 {
     private readonly DataContext _context;
     public GameService(DataContext context) => _context = context;
-
     public async Task<List<Game>> GetGamesAsync()
     {
         return await _context.Game

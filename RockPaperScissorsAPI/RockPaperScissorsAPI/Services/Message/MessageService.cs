@@ -5,7 +5,6 @@ using RockPaperScissorsAPI.Data;
 using RockPaperScissorsAPI.Model;
 
 namespace RockPaperScissorsAPI.Services;
-
 public class MessageService : IMessageService
 {
     private readonly DataContext _context;
@@ -17,11 +16,9 @@ public class MessageService : IMessageService
         .FromSqlRaw("[Procedure_GetMessages]")
         .ToListAsync();
     }
-
     public async Task<IEnumerable<Message>> GetMessageByIdAsync(long MessageID)
     {
         var parameter = new SqlParameter("@MessageID", MessageID);
-
         var info = await Task.Run(() =>
         _context.Message
         .FromSqlRaw(@"EXECUTE [Procedure_GetMessageByID] @MessageID", parameter)
@@ -32,7 +29,6 @@ public class MessageService : IMessageService
 
     public async Task<long> CreateNewMessageAsync(Message message)
     {
-
         var parameter = new List<SqlParameter>();
         parameter.Add(new SqlParameter("@FromUserID", message.FromUserID));
         parameter.Add(new SqlParameter("@ToUserID", message.ToUserID));
@@ -77,16 +73,9 @@ public class MessageService : IMessageService
         ($"[Procedure_DeleteMessage] {MessageID}"));
     }
 
-
     #region Specialize Requests
-
-
     public async Task<long> GenerateMessageAsync(Message message, string username)
     {
-
-      
-
-
         var parameter = new List<SqlParameter>();
         parameter.Add(new SqlParameter("@FromUserID", message.FromUserID));
         parameter.Add(new SqlParameter("@ToUserID", message.ToUserID));
@@ -102,11 +91,9 @@ public class MessageService : IMessageService
             @TimeSent", parameter.ToArray()));
 
         return result;
-
     }
     public async Task<List<Message?>> ReadMessagesAsync(long userID)
     {
-        
         var parameters = new SqlParameter[]
            {
             new SqlParameter("@UserID", userID),
@@ -118,7 +105,6 @@ public class MessageService : IMessageService
             .FromSqlRaw(@"EXECUTE [Procedure_GetMyMessages]
                     @UserID, @TimeReceived", parameters)
             .ToListAsync());
-
 
         return info;
     }

@@ -21,7 +21,6 @@ public class PlayerMovesService : IPlayerMovesService
     public async Task<IEnumerable<PlayerMoves>> GetPlayerMovesByIDAsync(byte MoveID)
     {
         var parameter = new SqlParameter("@MoveID", MoveID);
-
         var info = await Task.Run(() =>
         _context.PlayerMoves
         .FromSqlRaw(@"EXECUTE [Procedure_GetPlayerMovesByID] @MoveID", parameter)
@@ -32,7 +31,6 @@ public class PlayerMovesService : IPlayerMovesService
 
     public async Task<long> CreatePlayerMoveAsync(PlayerMoves playerMoves)
     {
-
         var parameter = new List<SqlParameter>();
         parameter.Add(new SqlParameter("@MovesTitle", playerMoves.MovesTitle));
 
@@ -73,7 +71,6 @@ public class PlayerMovesService : IPlayerMovesService
     //MoveID = 1
     public async Task<long> RockAsync(PlayerMoves playerMoves)
     {
-
         var parameter = new List<SqlParameter>();
         parameter.Add(new SqlParameter("@MovesTitle", playerMoves.MovesTitle));
 
@@ -88,7 +85,6 @@ public class PlayerMovesService : IPlayerMovesService
     //MoveID = 2
     public async Task<long> PaperAsync(PlayerMoves playerMoves)
     {
-
         var parameter = new List<SqlParameter>();
         parameter.Add(new SqlParameter("@MovesTitle", playerMoves.MovesTitle));
 
@@ -103,7 +99,6 @@ public class PlayerMovesService : IPlayerMovesService
     //MoveID = 3
     public async Task<long> ScissorAsync(PlayerMoves playerMoves)
     {
-
         var parameter = new List<SqlParameter>();
         parameter.Add(new SqlParameter("@MovesTitle", playerMoves.MovesTitle));
 
