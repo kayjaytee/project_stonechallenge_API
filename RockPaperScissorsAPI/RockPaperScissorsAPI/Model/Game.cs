@@ -28,6 +28,6 @@ public class Game
     [ForeignKey("MessageID")]
     public long? PlayerMessageID { get; set; }
 
-    public bool IsActive { get; set; }
+    public bool IsFinished { get; set; }
 
 }

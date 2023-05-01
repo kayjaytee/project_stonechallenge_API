@@ -12,7 +12,6 @@ public class GameService : IGameService
     private readonly DataContext _context;
     public GameService(DataContext context) => _context = context;
 
-
     public async Task<List<Game>> GetGamesAsync()
     {
         return await _context.Game
@@ -74,13 +73,11 @@ public class GameService : IGameService
             @PlayerMessageID", parameter.ToArray()));
 
         return result;
-
     }
     public async Task<long> DeleteGameAsync(long GameID)
     {
         return await Task.Run(() => _context.Database.ExecuteSqlInterpolatedAsync
         ($"[Procedure_DeleteGame] {GameID}"));
-
     }
 
     #region Specialized Requests
@@ -122,7 +119,6 @@ public class GameService : IGameService
             @PlayerOneChoice", parameter.ToArray()));
 
         return result;
-
     }
 
     public async Task<long> PlayerTwoMove(Game game, PlayerMoves playerMoves)
@@ -138,7 +134,6 @@ public class GameService : IGameService
             @PlayerTwoChoice", parameter.ToArray()));
 
         return result;
-
     }
 
     public async Task<long> DetermineWinnerAsync(Game game)
@@ -154,12 +149,23 @@ public class GameService : IGameService
             @PlayerWinner", parameter.ToArray()));
 
         return result;
+    }
 
+    public async Task<long> DetermineDrawAsync(Game game)
+    {
+        var parameter = new List<SqlParameter>();
+        parameter.Add(new SqlParameter("@GameID", game.GameID));
+
+        var result = await Task.Run(() =>
+        _context.Database.ExecuteSqlRawAsync
+        (@"EXECUTE [Procedure_DetermineDraw]
+            @GameID", parameter.ToArray()));
+
+        return result;
     }
 
     public async Task<long> IncreaseGamesPlayedAsync(Game game, UserScore user)
     {
-
         var parameter = new List<SqlParameter>();
         parameter.Add(new SqlParameter("@GameID", game.GameID));
 
@@ -169,12 +175,19 @@ public class GameService : IGameService
             @GameID", parameter.ToArray()));
 
         return result;
-
     }
 
     public async Task<Game> FetchGameIDAsync(long gameID)
     {
         return await _context.Game.FirstOrDefaultAsync(x => x.GameID == gameID);
+    }
+
+    public async Task<long> FetchNewlyCreatedGameIDAsync(long gameid)
+    {
+        return await _context.Game
+            .OrderByDescending(g => g.GameID)
+            .Select(g => g.GameID)
+            .FirstOrDefaultAsync();
     }
 
     #endregion

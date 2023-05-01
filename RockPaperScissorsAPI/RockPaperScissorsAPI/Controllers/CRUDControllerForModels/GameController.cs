@@ -9,11 +9,7 @@ namespace RockPaperScissorsAPI.Controllers;
 public class GameController : ControllerBase
 {
     private readonly IGameService gameService;
-
     public GameController(IGameService gameService) => this.gameService = gameService;
-
-
-
 
     [HttpGet("GetGamesList")]
     public async Task<List<Game>> GetGamesAsync()
@@ -26,7 +22,6 @@ public class GameController : ControllerBase
         {
             throw;
         }
-
     }
 
     [HttpGet("GetGameById")]
@@ -56,7 +51,6 @@ public class GameController : ControllerBase
         {
             return BadRequest();
         }
-
         try
         {
             var response = await gameService.CreateNewGameAsync(game);
@@ -76,7 +70,6 @@ public class GameController : ControllerBase
         {
             return BadRequest();
         }
-
         try
         {
             var result = await gameService.UpdateGameAsync(game);

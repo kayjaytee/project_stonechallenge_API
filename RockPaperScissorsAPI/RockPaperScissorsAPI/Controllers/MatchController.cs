@@ -106,9 +106,13 @@ public class MatchController : ControllerBase
     {
         try
         {
-      
             var game = await gameService.FetchGameIDAsync(gameID);
             game.GameID = gameID;
+
+            if (game.IsFinished == true)
+            {
+                return Ok("Game is already finished");
+            }
 
             UserScore user = new UserScore();
 
@@ -118,6 +122,8 @@ public class MatchController : ControllerBase
                     switch (game.PlayerTwoChoice) //Player 2
                     {
                         case 1: //Rock
+
+                            var draw = await gameService.DetermineDrawAsync(game);
                             var updateScore = await gameService.IncreaseGamesPlayedAsync(game, user);
                             return Ok("DRAW");
                         case 2: //Paper
@@ -146,8 +152,11 @@ public class MatchController : ControllerBase
                             return Ok("Player 1 Wins");
 
                         case 2: //Paper
+
+                            var draw = await gameService.DetermineDrawAsync(game);
                             var updateScore = await gameService.IncreaseGamesPlayedAsync(game, user);
                             return Ok("DRAW");
+
                         case 3: //Scissors
 
                             game.PlayerWinner = game.PlayerTwoID;
@@ -173,8 +182,11 @@ public class MatchController : ControllerBase
                             return Ok("Player 1 Wins");
 
                         case 3: //Scissors
+
+                            var draw = await gameService.DetermineDrawAsync(game);
                             var updateScore = await gameService.IncreaseGamesPlayedAsync(game, user);
                             return Ok("DRAW");
+
                         default:
                             throw new ArgumentException("Error occured");
                     }
@@ -184,7 +196,7 @@ public class MatchController : ControllerBase
         }
         catch (Exception e)
         {
-            throw new ArgumentException();
+            throw new ArgumentException(e.Message, e.Source);
         }
     }
 

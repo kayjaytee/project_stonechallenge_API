@@ -125,7 +125,7 @@ CREATE TABLE [Game](
 	[PlayerTwoChoice] smallint NULL,
 	[PlayerWinner] bigint NULL,
 	[PlayerMessageID] bigint NULL,
-	[IsActive] bit
+	[IsFinished] bit NOT NULL DEFAULT 0,
 	CONSTRAINT [FK_Game_PlayerOne_Move] FOREIGN KEY([PlayerOneChoice]) REFERENCES [PlayerMoves] ([MoveID]),
 	CONSTRAINT [FK_Game_PlayerTwo_Move] FOREIGN KEY([PlayerTwoChoice]) REFERENCES [PlayerMoves] ([MoveID]),
 	CONSTRAINT [FK_PlayerWinner] FOREIGN KEY([PlayerWinner]) REFERENCES [User] ([UserID]) ON DELETE NO ACTION,
@@ -483,7 +483,17 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE [Procedure_UpdateScoreWinner] -- fix this
+CREATE OR ALTER PROCEDURE [Procedure_DetermineDraw]
+@GameID bigint
+AS
+BEGIN
+    UPDATE [Game]
+    SET [IsFinished] = 1
+    WHERE [GameID] = @GameID
+END
+GO
+
+CREATE OR ALTER PROCEDURE [Procedure_UpdateScoreWinner] -- not in use
 @PlayerWinner bigint,
 @Wins bigint,
 @GamesPlayed bigint
@@ -497,7 +507,7 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE [Procedure_UpdateScoreLoser] -- fix this
+CREATE OR ALTER PROCEDURE [Procedure_UpdateScoreLoser] -- not in use
 @GameID bigint,
 @PlayerWinner bigint,
 @Losses bigint,
@@ -532,9 +542,14 @@ BEGIN
 	SET
 	[Losses] = [Losses] + 1
 	WHERE [UserID] = (SELECT [PlayerOneID] FROM [Game] WHERE [GameID] = @GameID AND [PlayerWinner] <> [PlayerOneID])
-		OR [UserID] = (SELECT [PlayerTwoID] FROM [Game] WHERE [GameID] = @GameID AND [PlayerWinner] <> [PlayerTwoID]);
+		OR [UserID] = (SELECT [PlayerTwoID] FROM [Game] WHERE [GameID] = @GameID AND [PlayerWinner] <> [PlayerTwoID])
+
+    UPDATE [Game]
+    SET [IsFinished] = 1
+    WHERE [GameID] = @GameID
 END
 GO
+
 SELECT* FROM [User];
 SELECT [PlayerOneID] FROM [Game] WHERE [GameID] = 1 AND [PlayerOneID] = [PlayerWinner]
 

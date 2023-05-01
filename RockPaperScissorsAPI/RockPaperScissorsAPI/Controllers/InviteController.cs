@@ -33,7 +33,6 @@ public class InviteController : ControllerBase
         this.httpContextAccessor = httpContextAccessor;
 
     }
-
     /// <summary>
     /// h. Läsa spel drag och dess status (läses från databasen)
     ///   i.Inbjudan skickad
@@ -47,15 +46,11 @@ public class InviteController : ControllerBase
     public async Task<IEnumerable<string>> CheckRequestsAsync()
     {
         var userID = long.Parse(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-
         playerInvite.InviteToUserID = userID;
 
         try
         {
-
-
             var invitesFrom = await playerInviteService.GetPlayerInviteToUserIDAsync(userID);
-
             var messages = new List<string>();
             foreach (var request in invitesFrom)
             {
@@ -64,8 +59,6 @@ public class InviteController : ControllerBase
             }
 
             return messages;
-
-
         }
         catch
         {
@@ -78,12 +71,8 @@ public class InviteController : ControllerBase
     [HttpPost("InvitePlayerToGame"), Authorize(Policy = "Authenticated for Login")]
     public async Task<IActionResult> InviteToGameAsync(string username)
     {
-
         var userID = long.Parse(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-
         playerInvite.InviteFromUserID = userID;
-
-
         try
         {
             var getUserName = await userService.FindIdFromUsernameAsync(username);
@@ -91,7 +80,6 @@ public class InviteController : ControllerBase
             {
                 return BadRequest("Player could not be found.");
             }
-
             playerInvite.InviteToUserID = (long)getUserName;
             var invite = await playerInviteService.InvitePlayerAsync(playerInvite);
 
@@ -103,7 +91,7 @@ public class InviteController : ControllerBase
         }
         catch
         {
-            throw;
+            return BadRequest("Player could not be found.");
         }
     }
 
@@ -111,7 +99,6 @@ public class InviteController : ControllerBase
     public async Task<IActionResult> AcceptInviteFromUsernameAsync(string username)
     {
         var myUserID = long.Parse(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-
 
         playerInvite.InviteToUserID = myUserID;
 
@@ -138,12 +125,11 @@ public class InviteController : ControllerBase
             }
             else
             {
-
                 var createGame = await gameService.HostNewGameAsync(game, playerInvite);
-
+                var gameID = await gameService.FetchNewlyCreatedGameIDAsync(game.GameID);
+                game.GameID = gameID;
                 var removeInvite = await playerInviteService.DeletePlayerInvitationAsync(playerInvite.InviteFromUserID);
-
-                return Ok("You accepted " + username + " challenge to a game of Rock Paper Scissors! \nThe Game ID is: +" + game.GameID.ToString());
+                return Ok("You accepted " + username + " challenge to a game of Rock Paper Scissors! \nThe Game ID is: " + game.GameID);
             }
 
         }
@@ -153,7 +139,7 @@ public class InviteController : ControllerBase
         }
         catch
         {
-            throw;
+            return BadRequest("Request denied.");
         }
     }
 
